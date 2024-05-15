@@ -19,7 +19,7 @@ data class Item(
     @SerializedName("tags")
     val tags: List<String>,
     @SerializedName("stats")
-    val stats: ItemStats
+    val stats: Map<String, Double>
 )
 
 data class ItemImage(
@@ -36,25 +36,4 @@ data class ItemGold(
     val sell: Int,
     @SerializedName("purchasable")
     val purchasable: Boolean
-)
-
-data class ItemStats(
-    @SerializedName("FlatCritChanceMod")
-    val flatCritChanceMod: Double?,
-    @SerializedName("FlatPhysicalDamageMod")
-    val flatPhysicalDamageMod: Double?,
-    @SerializedName("FlatHPPoolMod")
-    val flatHPPoolMod: Double?,
-    @SerializedName("FlatMagicDamageMod")
-    val flatMagicDamageMod: Double?,
-    @SerializedName("PercentAttackSpeedMod")
-    val percentAttackSpeedMod: Double?,
-    @SerializedName("FlatArmorMod")
-    val flatArmorMod: Double?,
-    @SerializedName("FlatSpellBlockMod")
-    val flatSpellBlockMod: Double?,
-    @SerializedName("PercentLifeStealMod")
-    val percentLifeStealMod: Double?,
-    @SerializedName("FlatMovementSpeedMod")
-    val flatMovementSpeedMod: Double?
 )

@@ -23,11 +23,23 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.pkrob.ApiDocLoL.model.Item
 
+val statNameMapping = mapOf(
+    "FlatCritChanceMod" to "Chance Critique",
+    "FlatPhysicalDamageMod" to "Dégâts Physiques",
+    "FlatHPPoolMod" to "Santé",
+    "FlatMagicDamageMod" to "Dégâts Magiques",
+    "PercentAttackSpeedMod" to "Vitesse d'Attaque",
+    "FlatArmorMod" to "Armure",
+    "FlatSpellBlockMod" to "Résistance Magique",
+    "PercentLifeStealMod" to "Vol de Vie",
+    "FlatMovementSpeedMod" to "Vitesse de Déplacement"
+)
+
 @Composable
 fun ItemList(items: List<Item>, version: String) {
     var query by remember { mutableStateOf("") }
     val filteredItems = items.filter {
-        it.name.contains(query, ignoreCase = true) || it.description.contains(query, ignoreCase = true)
+        it.name.contains(query, ignoreCase = true)
     }
 
     Column {
@@ -84,32 +96,8 @@ fun ItemDetailsDialog(item: Item, version: String, onDismiss: () -> Unit) {
                 Text(text = item.description)
                 Text(text = "Coût : ${item.gold.total} PO", style = MaterialTheme.typography.bodyMedium)
                 Text(text = "Statistiques :", style = MaterialTheme.typography.bodyMedium)
-                item.stats.flatCritChanceMod?.let {
-                    Text(text = "Chance Critique : ${it * 100}%", style = MaterialTheme.typography.bodyMedium)
-                }
-                item.stats.flatPhysicalDamageMod?.let {
-                    Text(text = "Dégâts Physiques : $it", style = MaterialTheme.typography.bodyMedium)
-                }
-                item.stats.flatHPPoolMod?.let {
-                    Text(text = "Santé : $it", style = MaterialTheme.typography.bodyMedium)
-                }
-                item.stats.flatMagicDamageMod?.let {
-                    Text(text = "Dégâts Magiques : $it", style = MaterialTheme.typography.bodyMedium)
-                }
-                item.stats.percentAttackSpeedMod?.let {
-                    Text(text = "Vitesse d'Attaque : ${it * 100}%", style = MaterialTheme.typography.bodyMedium)
-                }
-                item.stats.flatArmorMod?.let {
-                    Text(text = "Armure : $it", style = MaterialTheme.typography.bodyMedium)
-                }
-                item.stats.flatSpellBlockMod?.let {
-                    Text(text = "Résistance Magique : $it", style = MaterialTheme.typography.bodyMedium)
-                }
-                item.stats.percentLifeStealMod?.let {
-                    Text(text = "Vol de Vie : ${it * 100}%", style = MaterialTheme.typography.bodyMedium)
-                }
-                item.stats.flatMovementSpeedMod?.let {
-                    Text(text = "Vitesse de Déplacement : $it", style = MaterialTheme.typography.bodyMedium)
+                item.stats.forEach { (key, value) ->
+                    Text(text = "${statNameMapping[key] ?: key} : $value", style = MaterialTheme.typography.bodyMedium)
                 }
                 Text(text = "Tags : ${item.tags.joinToString(", ")}", style = MaterialTheme.typography.bodyMedium)
             }
