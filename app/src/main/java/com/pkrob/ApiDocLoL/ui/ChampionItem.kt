@@ -26,8 +26,8 @@ fun ChampionItem(champion: Champion, version: String, onClick: () -> Unit) {
             contentScale = ContentScale.Crop
         )
         Column(modifier = Modifier.padding(start = 8.dp)) {
-            Text(text = champion.name, style = MaterialTheme.typography.headlineMedium)
-            Text(text = champion.title, style = MaterialTheme.typography.titleMedium)
+            Text(text = champion.name, style = MaterialTheme.typography.displayMedium)
+            Text(text = champion.title, style = MaterialTheme.typography.bodyLarge)
         }
     }
 }
