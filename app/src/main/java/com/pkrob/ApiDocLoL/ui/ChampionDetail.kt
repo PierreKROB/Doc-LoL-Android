@@ -58,14 +58,14 @@ fun ChampionDetailScreen(viewModel: ChampionViewModel, version: String, champion
                         )
                         Text(
                             text = champion.name,
-                            style = MaterialTheme.typography.headlineMedium,
+                            style = MaterialTheme.typography.displayLarge,
                             modifier = Modifier
                                 .padding(top = 8.dp)
                                 .align(Alignment.CenterHorizontally)
                         )
                         Text(
                             text = champion.title,
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.displayMedium,
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
                         )
@@ -86,7 +86,7 @@ fun ChampionDetailScreen(viewModel: ChampionViewModel, version: String, champion
             item {
                 Text(
                     text = "Spells",
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.displayMedium,
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
             }
@@ -118,7 +118,7 @@ fun ChampionDetailScreen(viewModel: ChampionViewModel, version: String, champion
                         ) {
                             Text(
                                 text = spell.name,
-                                style = MaterialTheme.typography.titleMedium,
+                                style = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier.padding(bottom = 4.dp)
                             )
                             Text(
