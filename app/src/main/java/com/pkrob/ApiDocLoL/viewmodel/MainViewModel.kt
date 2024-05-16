@@ -5,16 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.pkrob.ApiDocLoL.model.ChampionsResponse
 import com.pkrob.ApiDocLoL.model.ItemsResponse
 import com.pkrob.ApiDocLoL.network.ApiService
-import com.pkrob.ApiDocLoL.repository.ChampionRepository
-import com.pkrob.ApiDocLoL.repository.ItemRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val apiService: ApiService) : ViewModel() {
-
-    private val championRepository = ChampionRepository()
-    private val itemRepository = ItemRepository()
 
     private val _versions = MutableStateFlow<List<String>>(emptyList())
     val versions: StateFlow<List<String>> = _versions
@@ -55,18 +50,18 @@ class MainViewModel(private val apiService: ApiService) : ViewModel() {
 
     private fun getAllChampions(version: String) {
         viewModelScope.launch {
-            val response = championRepository.getChampions(version)
-            if (response != null) {
-                _champions.value = response
+            val response = apiService.getAllChampions(version)
+            if (response.isSuccessful) {
+                _champions.value = response.body()
             }
         }
     }
 
     private fun getAllItems(version: String) {
         viewModelScope.launch {
-            val response = itemRepository.getItems(version)
-            if (response != null) {
-                _items.value = response
+            val response = apiService.getAllItems(version)
+            if (response.isSuccessful) {
+                _items.value = response.body()
             }
         }
     }

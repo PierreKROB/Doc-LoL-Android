@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.pkrob.ApiDocLoL.viewmodel.ChampionViewModel
 
@@ -106,7 +107,7 @@ fun ChampionDetailScreen(viewModel: ChampionViewModel, version: String, champion
                     ) {
                         val spellImageUrl = "https://ddragon.leagueoflegends.com/cdn/$version/img/spell/${spell.image.full}"
                         Image(
-                            painter = rememberImagePainter(spellImageUrl),
+                            painter = rememberAsyncImagePainter(spellImageUrl),
                             contentDescription = "Spell Image",
                             modifier = Modifier
                                 .size(64.dp)

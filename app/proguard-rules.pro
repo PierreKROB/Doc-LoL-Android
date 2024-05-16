@@ -1,25 +1,3 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
-
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
-
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
-
 # Règles pour supprimer les avertissements liés aux classes manquantes
 -dontwarn org.bouncycastle.jsse.BCSSLParameters
 -dontwarn org.bouncycastle.jsse.BCSSLSocket
@@ -30,3 +8,24 @@
 -dontwarn org.openjsse.javax.net.ssl.SSLParameters
 -dontwarn org.openjsse.javax.net.ssl.SSLSocket
 -dontwarn org.openjsse.net.ssl.OpenJSSE
+
+# Retrofit
+-keep interface retrofit2.http.** { *; }
+-keepattributes Signature, RuntimeVisibleAnnotations, AnnotationDefault
+-keep class retrofit2.** { *; }
+
+# Gson
+-keep class com.google.gson.** { *; }
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keepattributes Signature
+
+# Garder les informations de type générique pour Retrofit et Gson
+-keepattributes Signature
+-keepattributes Exceptions
+
+# Garder les classes de modèles et ViewModels
+-keep class com.pkrob.ApiDocLoL.model.** { *; }
+-keep class com.pkrob.ApiDocLoL.viewmodel.** { *; }
+
+# Garder les attributs de ProGuard pour les classes de modèles et ViewModels
+-keepattributes RuntimeVisibleAnnotations, AnnotationDefault

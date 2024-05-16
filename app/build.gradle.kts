@@ -11,8 +11,8 @@ android {
         applicationId = "com.pkrob.ApiDocLoL"
         minSdk = 30
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.3.1"
+        versionCode = 6
+        versionName = "1.3.1.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -22,7 +22,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

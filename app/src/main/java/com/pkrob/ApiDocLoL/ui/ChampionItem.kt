@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.pkrob.ApiDocLoL.model.Champion
 
@@ -20,7 +21,7 @@ fun ChampionItem(champion: Champion, version: String, onClick: () -> Unit) {
     Row(modifier = Modifier.padding(8.dp).clickable { onClick() }) {
         val imageUrl = "https://ddragon.leagueoflegends.com/cdn/$version/img/champion/${champion.id}.png"
         Image(
-            painter = rememberImagePainter(imageUrl),
+            painter = rememberAsyncImagePainter(imageUrl),
             contentDescription = "Champion Image",
             modifier = Modifier.size(64.dp),
             contentScale = ContentScale.Crop
