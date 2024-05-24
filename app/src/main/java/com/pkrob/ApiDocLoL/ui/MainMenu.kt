@@ -8,9 +8,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -29,6 +29,42 @@ fun MainMenu(navController: NavController, mainViewModel: MainViewModel) {
     val versions by mainViewModel.versions.collectAsState()
     val selectedVersion by mainViewModel.selectedVersion.collectAsState()
     val isLoading by mainViewModel.isLoading.collectAsState()
+
+    // Filter out the "lolpatch_" versions
+    val filteredVersions = versions.filterNot { it.startsWith("lolpatch_") }
+
+    // Extract the list of seasons from the filtered versions
+    val seasons = filteredVersions.map { it.split(".")[0] }.distinct()
+
+    // State for selected season
+    var selectedSeason by rememberSaveable { mutableStateOf("") }
+    var expandedSeason by remember { mutableStateOf(false) }
+    var expandedVersion by remember { mutableStateOf(false) }
+
+    // Filter versions based on selected season
+    var seasonVersions by remember { mutableStateOf(listOf<String>()) }
+
+    LaunchedEffect(versions) {
+        if (seasons.isNotEmpty() && selectedSeason.isEmpty()) {
+            selectedSeason = seasons.first()
+        }
+    }
+
+    LaunchedEffect(selectedSeason) {
+        seasonVersions = filteredVersions.filter { it.startsWith(selectedSeason) }
+        if (seasonVersions.isNotEmpty() && selectedVersion.isNullOrEmpty()) {
+            mainViewModel.selectVersion(seasonVersions.first())
+        }
+    }
+
+    fun onSeasonSelected(season: String) {
+        selectedSeason = season
+        seasonVersions = filteredVersions.filter { it.startsWith(season) }
+        if (seasonVersions.isNotEmpty()) {
+            mainViewModel.selectVersion(seasonVersions.first())
+        }
+        expandedSeason = false
+    }
 
     if (isLoading) {
         LoadingScreen()
@@ -54,38 +90,73 @@ fun MainMenu(navController: NavController, mainViewModel: MainViewModel) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                var expanded by remember { mutableStateOf(false) }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedButton(
-                        onClick = { expanded = true },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary)
+                    // Season Dropdown
+                    Box(
+                        modifier = Modifier.weight(1f).padding(end = 4.dp)
                     ) {
-                        Text(
-                            text = selectedVersion ?: "Select Version",
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
-                    }
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        versions.forEach { version ->
-                            DropdownMenuItem(
-                                text = { Text(text = version) },
-                                onClick = {
-                                    mainViewModel.selectVersion(version)
-                                    expanded = false
-                                }
+                        OutlinedButton(
+                            onClick = { expandedSeason = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary)
+                        ) {
+                            Text(
+                                text = if (selectedSeason.isEmpty()) "Select Season" else "Season $selectedSeason",
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.bodyLarge
                             )
+                            Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
+                        }
+                        DropdownMenu(
+                            expanded = expandedSeason,
+                            onDismissRequest = { expandedSeason = false }
+                        ) {
+                            seasons.forEach { season ->
+                                DropdownMenuItem(
+                                    text = { Text(text = "Season $season") },
+                                    onClick = { onSeasonSelected(season) }
+                                )
+                            }
+                        }
+                    }
+
+                    // Version Dropdown
+                    if (selectedSeason.isNotEmpty()) {
+                        Box(
+                            modifier = Modifier.weight(1f).padding(start = 4.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = { expandedVersion = true },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary)
+                            ) {
+                                Text(
+                                    text = selectedVersion ?: "Select Version",
+                                    fontSize = 16.sp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                                Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
+                            }
+                            DropdownMenu(
+                                expanded = expandedVersion,
+                                onDismissRequest = { expandedVersion = false }
+                            ) {
+                                seasonVersions.forEach { version ->
+                                    DropdownMenuItem(
+                                        text = { Text(text = version) },
+                                        onClick = {
+                                            mainViewModel.selectVersion(version)
+                                            expandedVersion = false
+                                        }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
