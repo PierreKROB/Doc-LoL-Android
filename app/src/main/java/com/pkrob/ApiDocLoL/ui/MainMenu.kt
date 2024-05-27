@@ -1,5 +1,6 @@
 package com.pkrob.ApiDocLoL.ui
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,6 +30,10 @@ fun MainMenu(navController: NavController, mainViewModel: MainViewModel) {
     val versions by mainViewModel.versions.collectAsState()
     val selectedVersion by mainViewModel.selectedVersion.collectAsState()
     val isLoading by mainViewModel.isLoading.collectAsState()
+
+    val context = navController.context
+    val sharedPreferences = context.getSharedPreferences("clicker_prefs", Context.MODE_PRIVATE)
+    val token = sharedPreferences.getString("token", null)
 
     // Filter out the "lolpatch_" versions
     val filteredVersions = versions.filterNot { it.startsWith("lolpatch_") }
@@ -75,9 +80,9 @@ fun MainMenu(navController: NavController, mainViewModel: MainViewModel) {
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color.Black, // Couleur sombre
-                            MaterialTheme.colorScheme.primary, // Couleur primaire
-                            MaterialTheme.colorScheme.secondary // Couleur secondaire
+                            Color.Black,
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.secondary
                         )
                     )
                 )
@@ -95,9 +100,10 @@ fun MainMenu(navController: NavController, mainViewModel: MainViewModel) {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Season Dropdown
                     Box(
-                        modifier = Modifier.weight(1f).padding(end = 4.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 4.dp)
                     ) {
                         OutlinedButton(
                             onClick = { expandedSeason = true },
@@ -125,10 +131,11 @@ fun MainMenu(navController: NavController, mainViewModel: MainViewModel) {
                         }
                     }
 
-                    // Version Dropdown
                     if (selectedSeason.isNotEmpty()) {
                         Box(
-                            modifier = Modifier.weight(1f).padding(start = 4.dp)
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(start = 4.dp)
                         ) {
                             OutlinedButton(
                                 onClick = { expandedVersion = true },
@@ -163,9 +170,9 @@ fun MainMenu(navController: NavController, mainViewModel: MainViewModel) {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                Row(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     CardButton(
                         navController = navController,
@@ -180,20 +187,37 @@ fun MainMenu(navController: NavController, mainViewModel: MainViewModel) {
                         imageRes = R.drawable.po,
                         destination = "itemList"
                     )
+
+                    CardButton(
+                        navController = navController,
+                        text = "Clicker",
+                        imageRes = R.drawable.logo_click,
+                        destination = if (token == null) "login" else "clicker"
+                    )
                 }
             }
         }
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardButton(navController: NavController, text: String, imageRes: Int, destination: String) {
     Card(
-        onClick = { navController.navigate(destination) },
+        onClick = {
+            if (destination == "login") {
+                navController.navigate(destination) {
+                    popUpTo("mainMenu") { inclusive = false }
+                }
+            } else {
+                navController.navigate(destination)
+            }
+        },
         modifier = Modifier
-            .size(150.dp)
-            .padding(8.dp),
+            .fillMaxWidth()
+            .padding(8.dp)
+            .height(150.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = RoundedCornerShape(12.dp)
     ) {

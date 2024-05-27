@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 class ItemRepository {
     suspend fun getItems(version: String): ItemsResponse? {
         return withContext(Dispatchers.IO) {
-            val response = RetrofitInstance.api.getAllItems(version)
+            val response = RetrofitInstance.dDragonApi.getAllItems(version)
             if (response.isSuccessful) {
                 response.body()
             } else {

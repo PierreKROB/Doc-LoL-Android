@@ -11,8 +11,8 @@ android {
         applicationId = "com.pkrob.ApiDocLoL"
         minSdk = 30
         targetSdk = 34
-        versionCode = 6
-        versionName = "1.3.1.5"
+        versionCode = 8
+        versionName = "1.3.1.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.lottie.compose)
+    implementation(libs.logging.interceptor)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

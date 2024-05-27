@@ -1,10 +1,12 @@
 package com.pkrob.ApiDocLoL.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pkrob.ApiDocLoL.model.ChampionsResponse
 import com.pkrob.ApiDocLoL.model.ItemsResponse
 import com.pkrob.ApiDocLoL.network.ApiService
+import com.pkrob.ApiDocLoL.network.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -33,12 +35,21 @@ class MainViewModel(private val apiService: ApiService) : ViewModel() {
     private fun getVersions() {
         viewModelScope.launch {
             _isLoading.value = true
-            val response = apiService.getVersions()
-            if (response.isSuccessful) {
-                _versions.value = response.body() ?: emptyList()
-                _selectedVersion.value = response.body()?.firstOrNull()
+            try {
+                val response = RetrofitInstance.dDragonApi.getVersions()
+                if (response.isSuccessful) {
+                    _versions.value = response.body() ?: emptyList()
+                    _selectedVersion.value = response.body()?.firstOrNull()
+                    _selectedVersion.value?.let {
+                        getAllChampions(it)
+                        getAllItems(it)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Exception getting versions", e)
+            } finally {
+                _isLoading.value = false
             }
-            _isLoading.value = false
         }
     }
 
@@ -50,18 +61,26 @@ class MainViewModel(private val apiService: ApiService) : ViewModel() {
 
     private fun getAllChampions(version: String) {
         viewModelScope.launch {
-            val response = apiService.getAllChampions(version)
-            if (response.isSuccessful) {
-                _champions.value = response.body()
+            try {
+                val response = apiService.getAllChampions(version)
+                if (response.isSuccessful) {
+                    _champions.value = response.body()
+                }
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Exception getting champions", e)
             }
         }
     }
 
     private fun getAllItems(version: String) {
         viewModelScope.launch {
-            val response = apiService.getAllItems(version)
-            if (response.isSuccessful) {
-                _items.value = response.body()
+            try {
+                val response = apiService.getAllItems(version)
+                if (response.isSuccessful) {
+                    _items.value = response.body()
+                }
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Exception getting items", e)
             }
         }
     }

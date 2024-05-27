@@ -102,7 +102,7 @@ data class ChampionSpell(
     @SerializedName("cost")
     val cost: List<Double>,
     @SerializedName("range")
-    val range: List<Double>,
+    val range: Any, // Peut être soit une liste de Double, soit une chaîne de caractères
     @SerializedName("image")
     val image: ChampionImage
 )

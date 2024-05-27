@@ -9,7 +9,7 @@ import kotlinx.coroutines.withContext
 class ChampionRepository {
     suspend fun getChampions(version: String): ChampionsResponse? {
         return withContext(Dispatchers.IO) {
-            val response = RetrofitInstance.api.getAllChampions(version)
+            val response = RetrofitInstance.dDragonApi.getAllChampions(version)
             if (response.isSuccessful) {
                 response.body()
             } else {
@@ -20,7 +20,7 @@ class ChampionRepository {
 
     suspend fun getChampionDetail(version: String, championId: String): ChampionDetailResponse? {
         return withContext(Dispatchers.IO) {
-            val response = RetrofitInstance.api.getChampionDetail(version, championId)
+            val response = RetrofitInstance.dDragonApi.getChampionDetail(version, championId)
             if (response.isSuccessful) {
                 response.body()
             } else {

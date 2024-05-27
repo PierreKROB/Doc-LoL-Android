@@ -3,8 +3,14 @@ package com.pkrob.ApiDocLoL.network
 import com.pkrob.ApiDocLoL.model.ChampionDetailResponse
 import com.pkrob.ApiDocLoL.model.ChampionsResponse
 import com.pkrob.ApiDocLoL.model.ItemsResponse
+import com.pkrob.ApiDocLoL.model.LoginRequest
+import com.pkrob.ApiDocLoL.model.LoginResponse
+import com.pkrob.ApiDocLoL.model.RegisterRequest
+import com.pkrob.ApiDocLoL.model.RegisterResponse
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ApiService {
@@ -19,4 +25,10 @@ interface ApiService {
 
     @GET("api/versions.json")
     suspend fun getVersions(): Response<List<String>>
+
+    @POST("user/login")
+    suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
+
+    @POST("user/create")
+    suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
 }
