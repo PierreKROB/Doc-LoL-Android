@@ -7,6 +7,7 @@ import com.pkrob.ApiDocLoL.model.LoginRequest
 import com.pkrob.ApiDocLoL.model.LoginResponse
 import com.pkrob.ApiDocLoL.model.RegisterRequest
 import com.pkrob.ApiDocLoL.model.RegisterResponse
+import com.pkrob.ApiDocLoL.model.User
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -31,4 +32,10 @@ interface ApiService {
 
     @POST("user/create")
     suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
+
+    @GET("clicker/user/{userId}")
+    suspend fun getUserData(@Path("userId") userId: String): Response<User>
+
+    @POST("clicker/user/{userId}")
+    suspend fun saveUserData(@Path("userId") userId: String, @Body user: User): Response<Void>
 }

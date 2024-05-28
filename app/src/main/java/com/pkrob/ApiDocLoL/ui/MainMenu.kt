@@ -1,5 +1,6 @@
 package com.pkrob.ApiDocLoL.ui
 
+import LoadingScreen
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -242,30 +243,5 @@ fun CardButton(navController: NavController, text: String, imageRes: Int, destin
                 textAlign = TextAlign.Center
             )
         }
-    }
-}
-
-@Composable
-fun LoadingScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color.Black, // Couleur sombre
-                        MaterialTheme.colorScheme.primary, // Couleur primaire
-                        MaterialTheme.colorScheme.secondary // Couleur secondaire
-                    )
-                )
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
-        LottieAnimation(
-            composition = composition,
-            iterations = LottieConstants.IterateForever,
-            modifier = Modifier.size(150.dp)
-        )
     }
 }

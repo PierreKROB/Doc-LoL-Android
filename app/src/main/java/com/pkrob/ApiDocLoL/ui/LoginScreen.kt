@@ -13,6 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.pkrob.ApiDocLoL.model.LoginRequest
 import com.pkrob.ApiDocLoL.network.RetrofitInstance
+import com.pkrob.ApiDocLoL.util.JwtUtils
+import com.pkrob.ApiDocLoL.util.SharedPreferencesManager
 import kotlinx.coroutines.launch
 
 @Composable
@@ -65,9 +67,10 @@ fun LoginScreen(navController: NavController) {
                             val responseBody = response.body()
                             if (responseBody?.token != null) {
                                 val sharedPreferences = navController.context.getSharedPreferences("clicker_prefs", Context.MODE_PRIVATE)
+                                val userId = JwtUtils.getUserIdFromToken(responseBody.token)
+                                SharedPreferencesManager.saveUserId(navController.context, userId ?: "")
                                 sharedPreferences.edit()
                                     .putString("token", responseBody.token)
-                                    .putString("userId", responseBody.userId)
                                     .putString("username", username)
                                     .apply()
                                 navController.navigate("clicker") {

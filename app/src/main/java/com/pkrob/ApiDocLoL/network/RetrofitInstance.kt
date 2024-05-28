@@ -18,7 +18,7 @@ object RetrofitInstance {
     private val retrofitDDragon by lazy {
         Retrofit.Builder()
             .baseUrl("https://ddragon.leagueoflegends.com/")
-            .client(client) // Ajoutez le client avec l'intercepteur ici
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
