@@ -27,15 +27,4 @@ interface ApiService {
     @GET("api/versions.json")
     suspend fun getVersions(): Response<List<String>>
 
-    @POST("user/login")
-    suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
-
-    @POST("user/create")
-    suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
-
-    @GET("clicker/user/{userId}")
-    suspend fun getUserData(@Path("userId") userId: String): Response<User>
-
-    @POST("clicker/user/{userId}")
-    suspend fun saveUserData(@Path("userId") userId: String, @Body user: User): Response<Void>
 }

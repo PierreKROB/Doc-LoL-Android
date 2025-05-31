@@ -1,27 +1,38 @@
 package com.pkrob.ApiDocLoL.ui
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.pkrob.ApiDocLoL.model.Item
+import com.pkrob.ApiDocLoL.ui.theme.*
 
 val statNameMapping = mapOf(
     "FlatHPPoolMod" to "Santé",
@@ -91,7 +102,6 @@ val statNameMapping = mapOf(
     "PercentSpellVampMod" to "Vampirisme des Sorts"
 )
 
-
 @Composable
 fun ItemList(items: List<Item>, version: String) {
     var query by remember { mutableStateOf("") }
@@ -99,70 +109,453 @@ fun ItemList(items: List<Item>, version: String) {
         it.name.contains(query, ignoreCase = true)
     }
 
-    Column {
-        SearchBar(query = query, onQueryChanged = { query = it }, label = "Recherche Items")
-        LazyColumn {
-            items(filteredItems) { item ->
-                ItemRow(item = item, version = version)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        GradientStart,
+                        GradientMiddle,
+                        GradientEnd
+                    )
+                )
+            )
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Header
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Objets",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = GoldPrimary,
+                            fontSize = 28.sp
+                        )
+                    )
+                    Text(
+                        text = "${filteredItems.size} objets disponibles",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = TextSecondaryDark
+                        ),
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+
+            // Search Bar
+            EnhancedSearchBar(
+                query = query,
+                onQueryChanged = { query = it },
+                label = "Rechercher un objet...",
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+
+            // Items List
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(filteredItems) { item ->
+                    EnhancedItemRow(item = item, version = version)
+                }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ItemRow(item: Item, version: String) {
+fun EnhancedItemRow(item: Item, version: String) {
     val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.98f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "scale"
+    )
 
-    Row(
+    val imageUrl = remember(version, item.image.full) {
+        "https://ddragon.leagueoflegends.com/cdn/$version/img/item/${item.image.full}"
+    }
+    val painter = rememberAsyncImagePainter(imageUrl)
+    val imageState = painter.state
+
+    Card(
+        onClick = { setShowDialog(true) },
         modifier = Modifier
-            .padding(8.dp)
-            .clickable { setShowDialog(true) }
+            .fillMaxWidth()
+            .scale(scale),
+        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
-        val imageUrl = "https://ddragon.leagueoflegends.com/cdn/$version/img/item/${item.image.full}"
-        Image(
-            painter = rememberAsyncImagePainter(imageUrl),
-            contentDescription = "Item Image",
-            modifier = Modifier.size(64.dp),
-            contentScale = ContentScale.Crop
-        )
-        Column(modifier = Modifier.padding(start = 8.dp)) {
-            Text(text = item.name, style = MaterialTheme.typography.displayMedium)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Item Image
+            Box(
+                modifier = Modifier.size(64.dp)
+            ) {
+                when (imageState) {
+                    is AsyncImagePainter.State.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Brush.radialGradient(
+                                        colors = listOf(
+                                            SurfaceVariant,
+                                            SurfaceDark
+                                        )
+                                    ),
+                                    RoundedCornerShape(12.dp)
+                                )
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 2.dp,
+                                color = GoldAccent
+                            )
+                        }
+                    }
+                    is AsyncImagePainter.State.Error -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(SurfaceVariant, RoundedCornerShape(12.dp))
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "?",
+                                color = TextSecondaryDark,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                    else -> {
+                        Image(
+                            painter = painter,
+                            contentDescription = "Item ${item.name}",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Item Info
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = item.name,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimaryDark,
+                        fontSize = 18.sp
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                Text(
+                    text = "${item.gold.total} PO",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = GoldAccent,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+                
+                if (item.tags.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        item.tags.take(2).forEach { tag ->
+                            Surface(
+                                color = BlueAccent.copy(alpha = 0.2f),
+                                shape = RoundedCornerShape(6.dp)
+                            ) {
+                                Text(
+                                    text = tag,
+                                    color = BlueAccent,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Arrow indicator
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = "Voir détails",
+                tint = TextSecondaryDark,
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 
     if (showDialog) {
-        ItemDetailsDialog(item = item, version = version, onDismiss = { setShowDialog(false) })
+        EnhancedItemDetailsDialog(item = item, version = version, onDismiss = { setShowDialog(false) })
     }
 }
 
 @Composable
-fun ItemDetailsDialog(item: Item, version: String, onDismiss: () -> Unit) {
-    val imageUrl = "https://ddragon.leagueoflegends.com/cdn/$version/img/item/${item.image.full}"
+fun EnhancedItemDetailsDialog(item: Item, version: String, onDismiss: () -> Unit) {
+    val imageUrl = remember(version, item.image.full) {
+        "https://ddragon.leagueoflegends.com/cdn/$version/img/item/${item.image.full}"
+    }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = item.name) },
-        text = {
-            Column {
-                Image(
-                    painter = rememberAsyncImagePainter(imageUrl),
-                    contentDescription = "Item Image",
-                    modifier = Modifier.size(64.dp),
-                    contentScale = ContentScale.Crop
-                )
-                Text(text = item.description)
-                Text(text = "Coût : ${item.gold.total} PO", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Statistiques :", style = MaterialTheme.typography.bodyMedium)
-                item.stats.forEach { (key, value) ->
-                    Text(text = "${statNameMapping[key] ?: key} : $value", style = MaterialTheme.typography.bodyMedium)
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 600.dp),
+            colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+            shape = RoundedCornerShape(20.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+            ) {
+                // Header with close button
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Détails de l'objet",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = GoldPrimary
+                        )
+                    )
+                    
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Fermer",
+                            tint = TextSecondaryDark
+                        )
+                    }
                 }
-                Text(text = "Tags : ${item.tags.joinToString(", ")}", style = MaterialTheme.typography.bodyMedium)
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Fermer")
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Content
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    // Item image and name
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Image(
+                            painter = rememberAsyncImagePainter(imageUrl),
+                            contentDescription = "Item Image",
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(RoundedCornerShape(16.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                        
+                        Spacer(modifier = Modifier.width(16.dp))
+                        
+                        Column {
+                            Text(
+                                text = item.name,
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextPrimaryDark
+                                )
+                            )
+                            
+                            Text(
+                                text = "${item.gold.total} PO",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    color = GoldAccent,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(20.dp))
+                    
+                    // Description
+                    if (item.description.isNotEmpty()) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = SurfaceVariant),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(12.dp)
+                            ) {
+                                Text(
+                                    text = "Description",
+                                    style = MaterialTheme.typography.titleSmall.copy(
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = BlueAccent
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = item.description,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        color = TextPrimaryDark
+                                    )
+                                )
+                            }
+                        }
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                    
+                    // Stats
+                    if (item.stats.isNotEmpty()) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = SurfaceVariant),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(12.dp)
+                            ) {
+                                Text(
+                                    text = "Statistiques",
+                                    style = MaterialTheme.typography.titleSmall.copy(
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = BlueAccent
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                
+                                item.stats.forEach { (key, value) ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 2.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = statNameMapping[key] ?: key,
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                color = TextPrimaryDark
+                                            ),
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        Text(
+                                            text = "+$value",
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                color = SuccessColor,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                    
+                    // Tags
+                    if (item.tags.isNotEmpty()) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = SurfaceVariant),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(12.dp)
+                            ) {
+                                Text(
+                                    text = "Catégories",
+                                    style = MaterialTheme.typography.titleSmall.copy(
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = BlueAccent
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    item.tags.forEach { tag ->
+                                        Surface(
+                                            color = GoldAccent.copy(alpha = 0.2f),
+                                            shape = RoundedCornerShape(8.dp)
+                                        ) {
+                                            Text(
+                                                text = tag,
+                                                color = GoldAccent,
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
-    )
+    }
+}
+
+// Keep these for compatibility
+@Composable
+fun ItemRow(item: Item, version: String) {
+    EnhancedItemRow(item = item, version = version)
+}
+
+@Composable
+fun ItemDetailsDialog(item: Item, version: String, onDismiss: () -> Unit) {
+    EnhancedItemDetailsDialog(item = item, version = version, onDismiss = onDismiss)
 }

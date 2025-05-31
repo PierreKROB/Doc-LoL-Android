@@ -9,24 +9,60 @@ import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColorScheme(
     primary = BluePrimary,
-    secondary = GoldAccent,
-    background = Background,
-    surface = Background,
     onPrimary = TextPrimaryDark,
-    onSecondary = TextPrimaryDark,
+    primaryContainer = BlueAccent,
+    onPrimaryContainer = BackgroundDark,
+    
+    secondary = GoldPrimary,
+    onSecondary = BackgroundDark,
+    secondaryContainer = GoldAccent,
+    onSecondaryContainer = BackgroundDark,
+    
+    tertiary = SilverAccent,
+    onTertiary = BackgroundDark,
+    
+    background = BackgroundDark,
     onBackground = TextPrimaryDark,
-    onSurface = TextPrimaryDark
+    
+    surface = SurfaceDark,
+    onSurface = TextPrimaryDark,
+    surfaceVariant = SurfaceVariant,
+    onSurfaceVariant = TextSecondaryDark,
+    
+    outline = TextSecondaryDark,
+    outlineVariant = SurfaceVariant,
+    
+    error = ErrorColor,
+    onError = TextPrimaryDark
 )
 
 private val LightColorPalette = lightColorScheme(
     primary = BluePrimary,
-    secondary = GoldAccent,
+    onPrimary = Color.White,
+    primaryContainer = BlueAccent,
+    onPrimaryContainer = BackgroundDark,
+    
+    secondary = GoldPrimary,
+    onSecondary = Color.White,
+    secondaryContainer = GoldAccent,
+    onSecondaryContainer = BackgroundDark,
+    
+    tertiary = SilverAccent,
+    onTertiary = BackgroundDark,
+    
     background = Color.White,
-    surface = Color.White,
-    onPrimary = TextPrimaryLight,
-    onSecondary = TextPrimaryLight,
     onBackground = TextPrimaryLight,
-    onSurface = TextPrimaryLight
+    
+    surface = Color.White,
+    onSurface = TextPrimaryLight,
+    surfaceVariant = Color(0xFFF5F5F5),
+    onSurfaceVariant = TextSecondaryLight,
+    
+    outline = TextSecondaryLight,
+    outlineVariant = Color(0xFFE0E0E0),
+    
+    error = ErrorColor,
+    onError = Color.White
 )
 
 @Composable
