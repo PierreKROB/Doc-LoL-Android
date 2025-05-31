@@ -331,8 +331,11 @@ fun ChampionDetailScreen(viewModel: ChampionViewModel, version: String, champion
                                     .padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                val spellImageUrl = remember(version, spell.image.full) {
+                                    "https://ddragon.leagueoflegends.com/cdn/$version/img/spell/${spell.image.full}"
+                                }
                                 SpellImageWithLoader(
-                                    imageUrl = "https://ddragon.leagueoflegends.com/cdn/$version/img/spell/${spell.image.full}",
+                                    imageUrl = spellImageUrl,
                                     spellName = spell.name,
                                     modifier = Modifier.size(64.dp)
                                 )
